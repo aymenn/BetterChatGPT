@@ -17,7 +17,7 @@ import SpinnerIcon from '@icon/SpinnerIcon';
 
 function App() {
   const { user, loading, isAuthenticated } = useSupabaseAuth();
-  useSupabaseSync();
+  const { loadingUserData } = useSupabaseSync();
   
   const initialiseNewChat = useInitialiseNewChat();
   const setChats = useStore((state) => state.setChats);
@@ -92,13 +92,15 @@ function App() {
     }
   }, []);
 
-  // Show loading spinner while checking authentication
-  if (loading) {
+  // Show loading spinner while checking authentication or loading user data
+  if (loading || (isAuthenticated && loadingUserData)) {
     return (
       <div className='flex items-center justify-center h-screen bg-gray-900'>
         <div className='flex flex-col items-center gap-4'>
           <SpinnerIcon className='w-8 h-8 animate-spin text-white' />
-          <p className='text-white text-sm'>Loading...</p>
+          <p className='text-white text-sm'>
+            {loading ? 'Authenticating...' : 'Loading your data...'}
+          </p>
         </div>
       </div>
     );

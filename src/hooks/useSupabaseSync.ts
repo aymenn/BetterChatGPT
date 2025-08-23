@@ -9,6 +9,7 @@ export const useSupabaseSync = () => {
   const { user, isAuthenticated } = useSupabaseAuth();
   const channelRef = useRef<RealtimeChannel | null>(null);
   const settingsChannelRef = useRef<RealtimeChannel | null>(null);
+  const [loadingUserData, setLoadingUserData] = useState(false);
   
   const setChats = useStore((state) => state.setChats);
   const setFolders = useStore((state) => state.setFolders);
@@ -31,6 +32,7 @@ export const useSupabaseSync = () => {
   const loadUserData = async () => {
     if (!user) return;
 
+    setLoadingUserData(true);
     try {
       // Load folders
       const { data: foldersData } = await SupabaseService.getFolders(user.id);
@@ -87,6 +89,8 @@ export const useSupabaseSync = () => {
       }
     } catch (error) {
       console.error('Error loading user data:', error);
+    } finally {
+      setLoadingUserData(false);
     }
   };
 
@@ -198,5 +202,6 @@ export const useSupabaseSync = () => {
   return {
     loadUserData,
     migrateLocalStorageData,
+    loadingUserData,
   };
 };

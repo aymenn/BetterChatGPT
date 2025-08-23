@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import useStore from '@store/store';
 
 import PlusIcon from '@icon/PlusIcon';
+import SpinnerIcon from '@icon/SpinnerIcon';
 
 import useAddChat from '@hooks/useAddChat';
 
