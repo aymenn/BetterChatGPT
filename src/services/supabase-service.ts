@@ -167,7 +167,7 @@ export class SupabaseService {
       .from('chatgpt_chats')
       .select(`
         *,
-        messages (
+        chatgpt_messages (
           id,
           role,
           content,
