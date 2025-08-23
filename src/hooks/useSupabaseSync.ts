@@ -95,7 +95,7 @@ export const useSupabaseSync = () => {
     if (!user) return;
 
     try {
-      // Check if user already has data in Supabase
+      // Check if user already has data in Supabase (only check chats, not profile)
       const { data: existingChats } = await SupabaseService.getChats(user.id);
       if (existingChats && existingChats.length > 0) {
         return; // User already has data, skip migration
@@ -123,7 +123,7 @@ export const useSupabaseSync = () => {
       }
 
       // Migrate user settings
-      await SupabaseService.upsertUserSettings(user.id, {
+      const { error: settingsError } = await SupabaseService.upsertUserSettings(user.id, {
         theme: state.theme,
         auto_title: state.autoTitle,
         advanced_mode: state.advancedMode,
@@ -136,6 +136,10 @@ export const useSupabaseSync = () => {
         total_token_used: state.totalTokenUsed,
         prompts: state.prompts,
       });
+      
+      if (settingsError) {
+        console.error('Error migrating user settings:', settingsError);
+      }
 
       // Clear localStorage after successful migration
       localStorage.removeItem('free-chat-gpt');
