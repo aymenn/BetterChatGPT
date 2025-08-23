@@ -60,10 +60,13 @@ export class SupabaseService {
     api_key?: string;
     api_endpoint?: string;
   }) {
+    // Use upsert to handle cases where profile doesn't exist yet
     const { data, error } = await supabase
       .from('chatgpt_user_profiles')
-      .update(updates)
-      .eq('id', userId)
+      .upsert({
+        id: userId,
+        ...updates,
+      })
       .select()
       .single();
     return { data, error };

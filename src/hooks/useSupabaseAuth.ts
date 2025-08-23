@@ -53,10 +53,11 @@ export const useSupabaseAuth = () => {
     try {
       const { data: profile, error } = await SupabaseService.getUserProfile(userId);
       
-      // If profile doesn't exist, create it for existing users
-      if (!profile || error) {
+      // If profile doesn't exist (error or no data), create it for existing users
+      if (error || !profile) {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
+          console.log('Creating profile for existing user:', user.id);
           const { data: newProfile, error: createError } = await SupabaseService.createUserProfile(
             userId,
             user.email || '',
@@ -65,16 +66,30 @@ export const useSupabaseAuth = () => {
           );
           
           if (createError) {
-            console.error('Error creating user profile:', createError);
-            return;
+            console.error('Error creating user profile, trying upsert:', createError);
+            // Try using upsert as fallback
+            const { data: upsertProfile, error: upsertError } = await SupabaseService.updateUserProfile(userId, {
+              api_key: useStore.getState().apiKey,
+              api_endpoint: useStore.getState().apiEndpoint,
+            });
+            
+            if (upsertError) {
+              console.error('Error upserting user profile:', upsertError);
+              return;
+            }
+            
+            // Use the upserted profile
+            if (upsertProfile?.api_key) setApiKey(upsertProfile.api_key);
+            if (upsertProfile?.api_endpoint) setApiEndpoint(upsertProfile.api_endpoint);
+          } else {
+            // Use the newly created profile
+            if (newProfile?.api_key) setApiKey(newProfile.api_key);
+            if (newProfile?.api_endpoint) setApiEndpoint(newProfile.api_endpoint);
           }
-          
-          // Use the newly created profile
-          if (newProfile?.api_key) setApiKey(newProfile.api_key);
-          if (newProfile?.api_endpoint) setApiEndpoint(newProfile.api_endpoint);
         }
       } else {
         // Use existing profile
+        console.log('Loaded existing profile for user:', userId);
         if (profile.api_key) setApiKey(profile.api_key);
         if (profile.api_endpoint) setApiEndpoint(profile.api_endpoint);
       }
