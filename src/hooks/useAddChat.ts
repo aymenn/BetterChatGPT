@@ -52,10 +52,3 @@ const useAddChat = () => {
 };
 
 export default useAddChat;
-    }
-  };
-
-  return addChat;
-};
-
-export default useAddChat;
