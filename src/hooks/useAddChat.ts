@@ -1,13 +1,12 @@
 import React from 'react';
 import useStore from '@store/store';
 import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
-import { useSupabaseStore } from '@store/supabase-store';
+import { SupabaseService } from '@services/supabase-service';
 import { generateDefaultChat } from '@constants/chat';
 import { ChatInterface } from '@type/chat';
 
 const useAddChat = () => {
   const { user } = useSupabaseAuth();
-  const { createChat } = useSupabaseStore();
   const setChats = useStore((state) => state.setChats);
   const setCurrentChatIndex = useStore((state) => state.setCurrentChatIndex);
 
@@ -23,11 +22,16 @@ const useAddChat = () => {
         title = `New Chat ${titleIndex}`;
       }
 
-      updatedChats.unshift(generateDefaultChat(title, folder));
+      const newChat = generateDefaultChat(title, folder);
+      updatedChats.unshift(newChat);
       
       // Save to Supabase if user is authenticated
       if (user) {
-        await createChat(user.id, updatedChats[0]);
+        try {
+          await SupabaseService.createChat(user.id, newChat);
+        } catch (error) {
+          console.error('Error creating chat in Supabase:', error);
+        }
       }
       
       setChats(updatedChats);

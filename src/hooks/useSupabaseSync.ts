@@ -65,7 +65,7 @@ export const useSupabaseSync = () => {
             })),
         }));
         setChats(chats);
-        if (chats.length > 0) {
+        if (chats.length > 0 && useStore.getState().currentChatIndex === -1) {
           setCurrentChatIndex(0);
         }
       }
