@@ -1,5 +1,5 @@
 import { StoreApi, create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { ChatSlice, createChatSlice } from './chat-slice';
 import { InputSlice, createInputSlice } from './input-slice';
 import { AuthSlice, createAuthSlice } from './auth-slice';
@@ -26,6 +26,7 @@ import {
   migrateV6,
   migrateV7,
 } from './migrate';
+import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
 
 export type StoreState = ChatSlice &
   InputSlice &
@@ -73,6 +74,7 @@ const useStore = create<StoreState>()(
     }),
     {
       name: 'free-chat-gpt',
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => createPartializedState(state),
       version: 8,
       migrate: (persistedState, version) => {

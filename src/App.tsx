@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 import useStore from '@store/store';
 import i18n from './i18n';
+import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
+import { useSupabaseSync } from '@hooks/useSupabaseSync';
+import { AuthModal } from '@components/Auth';
 
 import Chat from '@components/Chat';
 import Menu from '@components/Menu';
@@ -10,13 +13,19 @@ import { ChatInterface } from '@type/chat';
 import { Theme } from '@type/theme';
 import ApiPopup from '@components/ApiPopup';
 import Toast from '@components/Toast';
+import SpinnerIcon from '@icon/SpinnerIcon';
 
 function App() {
+  const { user, loading, isAuthenticated } = useSupabaseAuth();
+  useSupabaseSync();
+  
   const initialiseNewChat = useInitialiseNewChat();
   const setChats = useStore((state) => state.setChats);
   const setTheme = useStore((state) => state.setTheme);
   const setApiKey = useStore((state) => state.setApiKey);
   const setCurrentChatIndex = useStore((state) => state.setCurrentChatIndex);
+  
+  const [showAuthModal, setShowAuthModal] = React.useState(false);
 
   useEffect(() => {
     document.documentElement.lang = i18n.language;
@@ -24,6 +33,15 @@ function App() {
       document.documentElement.lang = lng;
     });
   }, []);
+
+  useEffect(() => {
+    // Show auth modal if not authenticated and not loading
+    if (!loading && !isAuthenticated) {
+      setShowAuthModal(true);
+    } else {
+      setShowAuthModal(false);
+    }
+  }, [loading, isAuthenticated]);
 
   useEffect(() => {
     // legacy local storage
@@ -74,12 +92,24 @@ function App() {
     }
   }, []);
 
+  // Show loading spinner while checking authentication
+  if (loading) {
+    return (
+      <div className='flex items-center justify-center h-screen bg-gray-900'>
+        <div className='flex flex-col items-center gap-4'>
+          <SpinnerIcon className='w-8 h-8 animate-spin text-white' />
+          <p className='text-white text-sm'>Loading...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className='overflow-hidden w-full h-full relative'>
       <Menu />
       <Chat />
       <ApiPopup />
       <Toast />
+      <AuthModal isOpen={showAuthModal} setIsOpen={setShowAuthModal} />
     </div>
   );
 }
