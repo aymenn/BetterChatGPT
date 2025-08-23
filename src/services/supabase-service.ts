@@ -35,7 +35,7 @@ export class SupabaseService {
   // Profile methods
   static async createUserProfile(userId: string, email: string, apiKey?: string, apiEndpoint?: string) {
     const { data, error } = await supabase
-      .from('user_profiles')
+      .from('chatgpt_user_profiles')
       .insert({
         id: userId,
         email,
@@ -49,7 +49,7 @@ export class SupabaseService {
 
   static async getUserProfile(userId: string) {
     const { data, error } = await supabase
-      .from('user_profiles')
+      .from('chatgpt_user_profiles')
       .select('*')
       .eq('id', userId)
       .single();
@@ -61,7 +61,7 @@ export class SupabaseService {
     api_endpoint?: string;
   }) {
     const { data, error } = await supabase
-      .from('user_profiles')
+      .from('chatgpt_user_profiles')
       .update(updates)
       .eq('id', userId)
       .select()
@@ -72,7 +72,7 @@ export class SupabaseService {
   // User settings methods
   static async getUserSettings(userId: string) {
     const { data, error } = await supabase
-      .from('user_settings')
+      .from('chatgpt_user_settings')
       .select('*')
       .eq('id', userId)
       .single();
@@ -93,7 +93,7 @@ export class SupabaseService {
     prompts?: Prompt[];
   }) {
     const { data, error } = await supabase
-      .from('user_settings')
+      .from('chatgpt_user_settings')
       .upsert({
         id: userId,
         ...settings,
@@ -106,7 +106,7 @@ export class SupabaseService {
   // Folder methods
   static async getFolders(userId: string) {
     const { data, error } = await supabase
-      .from('folders')
+      .from('chatgpt_folders')
       .select('*')
       .eq('user_id', userId)
       .order('folder_order', { ascending: true });
@@ -121,7 +121,7 @@ export class SupabaseService {
     order: number;
   }) {
     const { data, error } = await supabase
-      .from('folders')
+      .from('chatgpt_folders')
       .insert({
         id: folder.id,
         user_id: userId,
@@ -142,7 +142,7 @@ export class SupabaseService {
     folder_order?: number;
   }) {
     const { data, error } = await supabase
-      .from('folders')
+      .from('chatgpt_folders')
       .update(updates)
       .eq('id', folderId)
       .select()
@@ -152,7 +152,7 @@ export class SupabaseService {
 
   static async deleteFolder(folderId: string) {
     const { error } = await supabase
-      .from('folders')
+      .from('chatgpt_folders')
       .delete()
       .eq('id', folderId);
     return { error };
@@ -161,7 +161,7 @@ export class SupabaseService {
   // Chat methods
   static async getChats(userId: string) {
     const { data, error } = await supabase
-      .from('chats')
+      .from('chatgpt_chats')
       .select(`
         *,
         messages (
@@ -179,7 +179,7 @@ export class SupabaseService {
 
   static async createChat(userId: string, chat: ChatInterface) {
     const { data: chatData, error: chatError } = await supabase
-      .from('chats')
+      .from('chatgpt_chats')
       .insert({
         id: chat.id,
         user_id: userId,
@@ -203,7 +203,7 @@ export class SupabaseService {
       }));
 
       const { error: messagesError } = await supabase
-        .from('messages')
+        .from('chatgpt_messages')
         .insert(messagesData);
 
       if (messagesError) return { data: null, error: messagesError };
@@ -219,7 +219,7 @@ export class SupabaseService {
     config?: ConfigInterface;
   }) {
     const { data, error } = await supabase
-      .from('chats')
+      .from('chatgpt_chats')
       .update(updates)
       .eq('id', chatId)
       .select()
@@ -229,7 +229,7 @@ export class SupabaseService {
 
   static async deleteChat(chatId: string) {
     const { error } = await supabase
-      .from('chats')
+      .from('chatgpt_chats')
       .delete()
       .eq('id', chatId);
     return { error };
@@ -238,7 +238,7 @@ export class SupabaseService {
   // Message methods
   static async addMessage(chatId: string, message: MessageInterface, order: number) {
     const { data, error } = await supabase
-      .from('messages')
+      .from('chatgpt_messages')
       .insert({
         chat_id: chatId,
         role: message.role,
@@ -255,7 +255,7 @@ export class SupabaseService {
     role?: string;
   }) {
     const { data, error } = await supabase
-      .from('messages')
+      .from('chatgpt_messages')
       .update(updates)
       .eq('id', messageId)
       .select()
@@ -265,7 +265,7 @@ export class SupabaseService {
 
   static async deleteMessage(messageId: string) {
     const { error } = await supabase
-      .from('messages')
+      .from('chatgpt_messages')
       .delete()
       .eq('id', messageId);
     return { error };
@@ -274,7 +274,7 @@ export class SupabaseService {
   static async reorderMessages(chatId: string, messages: Array<{ id: string; order: number }>) {
     const updates = messages.map(({ id, order }) => 
       supabase
-        .from('messages')
+        .from('chatgpt_messages')
         .update({ message_order: order })
         .eq('id', id)
     );
@@ -293,7 +293,7 @@ export class SupabaseService {
         {
           event: '*',
           schema: 'public',
-          table: 'chats',
+          table: 'chatgpt_chats',
           filter: `user_id=eq.${userId}`,
         },
         callback
@@ -303,7 +303,7 @@ export class SupabaseService {
         {
           event: '*',
           schema: 'public',
-          table: 'messages',
+          table: 'chatgpt_messages',
         },
         callback
       )
@@ -312,7 +312,7 @@ export class SupabaseService {
         {
           event: '*',
           schema: 'public',
-          table: 'folders',
+          table: 'chatgpt_folders',
           filter: `user_id=eq.${userId}`,
         },
         callback
@@ -328,7 +328,7 @@ export class SupabaseService {
         {
           event: '*',
           schema: 'public',
-          table: 'user_settings',
+          table: 'chatgpt_user_settings',
           filter: `id=eq.${userId}`,
         },
         callback

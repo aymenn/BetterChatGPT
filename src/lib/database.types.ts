@@ -9,7 +9,7 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      user_profiles: {
+      chatgpt_user_profiles: {
         Row: {
           id: string
           email: string | null
@@ -35,7 +35,7 @@ export interface Database {
           updated_at?: string
         }
       }
-      folders: {
+      chatgpt_folders: {
         Row: {
           id: string
           user_id: string
@@ -67,7 +67,7 @@ export interface Database {
           updated_at?: string
         }
       }
-      chats: {
+      chatgpt_chats: {
         Row: {
           id: string
           user_id: string
@@ -99,7 +99,7 @@ export interface Database {
           updated_at?: string
         }
       }
-      messages: {
+      chatgpt_messages: {
         Row: {
           id: string
           chat_id: string
@@ -125,7 +125,7 @@ export interface Database {
           created_at?: string
         }
       }
-      user_settings: {
+      chatgpt_user_settings: {
         Row: {
           id: string
           theme: string
