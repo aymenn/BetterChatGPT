@@ -157,7 +157,7 @@ export const generateDefaultChat = (
   title: title ? title : 'New Chat',
   messages:
     useStore.getState().defaultSystemMessage.length > 0
-      ? [{ role: 'system', content: useStore.getState().defaultSystemMessage }]
+      ? [{ role: 'system', content: useStore.getState().defaultSystemMessage, id: uuidv4() }]
       : [],
   config: { ...useStore.getState().defaultChatConfig },
   titleSet: false,

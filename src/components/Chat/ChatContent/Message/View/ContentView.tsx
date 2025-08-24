@@ -61,8 +61,27 @@ const ContentView = memo(
       const updatedChats: ChatInterface[] = JSON.parse(
         JSON.stringify(useStore.getState().chats)
       );
+      const messageToDelete = updatedChats[currentChatIndex].messages[messageIndex];
       updatedChats[currentChatIndex].messages.splice(messageIndex, 1);
       setChats(updatedChats);
+      
+      // Delete from Supabase and reorder remaining messages
+      const deleteFromSupabase = async () => {
+        try {
+          await SupabaseService.deleteMessage(messageToDelete.id);
+          
+          // Reorder remaining messages
+          const remainingMessages = updatedChats[currentChatIndex].messages;
+          const reorderData = remainingMessages.map((msg, index) => ({
+            id: msg.id,
+            order: index,
+          }));
+          await SupabaseService.reorderMessages(updatedChats[currentChatIndex].id, reorderData);
+        } catch (error) {
+          console.error('Error deleting message from Supabase:', error);
+        }
+      };
+      deleteFromSupabase();
     };
 
     const handleMove = (direction: 'up' | 'down') => {
@@ -79,6 +98,20 @@ const ContentView = memo(
         updatedMessages[messageIndex + 1] = temp;
       }
       setChats(updatedChats);
+      
+      // Update message order in Supabase
+      const updateOrderInSupabase = async () => {
+        try {
+          const reorderData = updatedMessages.map((msg, index) => ({
+            id: msg.id,
+            order: index,
+          }));
+          await SupabaseService.reorderMessages(updatedChats[currentChatIndex].id, reorderData);
+        } catch (error) {
+          console.error('Error updating message order in Supabase:', error);
+        }
+      };
+      updateOrderInSupabase();
     };
 
     const handleMoveUp = () => {

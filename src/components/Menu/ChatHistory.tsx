@@ -42,6 +42,16 @@ const ChatHistory = React.memo(
       updatedChats[chatIndex].title = _title;
       setChats(updatedChats);
       setIsEdit(false);
+      
+      // Update in Supabase
+      const updateChatTitle = async () => {
+        try {
+          await SupabaseService.updateChat(_chatId, { title: _title });
+        } catch (error) {
+          console.error('Error updating chat title in Supabase:', error);
+        }
+      };
+      updateChatTitle();
     };
 
     const deleteChat = async () => {

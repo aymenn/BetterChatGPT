@@ -12,8 +12,6 @@ const ApiPopup = () => {
   const { user, loading: authLoading, isAuthenticated } = useSupabaseAuth();
   const apiKey = useStore((state) => state.apiKey);
   const setApiKey = useStore((state) => state.setApiKey);
-  const firstVisit = useStore((state) => state.firstVisit);
-  const setFirstVisit = useStore((state) => state.setFirstVisit);
 
   const [_apiKey, _setApiKey] = useState<string>(apiKey || '');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -21,12 +19,12 @@ const ApiPopup = () => {
 
   // Only show API dialog if user is not authenticated, not loading, and has no API key
   useEffect(() => {
-    if (!authLoading && !isAuthenticated && !apiKey && firstVisit) {
+    if (!authLoading && !isAuthenticated && !apiKey) {
       setIsModalOpen(true);
     } else {
       setIsModalOpen(false);
     }
-  }, [authLoading, isAuthenticated, apiKey, firstVisit]);
+  }, [authLoading, isAuthenticated, apiKey]);
 
   const handleConfirm = () => {
     if (_apiKey.length === 0) {
@@ -37,10 +35,6 @@ const ApiPopup = () => {
       setIsModalOpen(false);
     }
   };
-
-  useEffect(() => {
-    setFirstVisit(false);
-  }, []);
 
   return isModalOpen ? (
     <PopupModal

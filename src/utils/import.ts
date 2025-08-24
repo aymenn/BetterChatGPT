@@ -37,6 +37,8 @@ const validateMessage = (messages: MessageInterface[]) => {
     if (!(typeof message.content === 'string')) return false;
     if (!(typeof message.role === 'string')) return false;
     if (!roles.includes(message.role)) return false;
+    // Add id if missing for backward compatibility
+    if (!message.id) message.id = uuidv4();
   }
   return true;
 };
@@ -120,7 +122,7 @@ export const convertOpenAIToBetterChatGPTFormat = (
   return {
     id: uuidv4(),
     title: openAIChat.title,
-    messages,
+    messages: messages.map(msg => ({ ...msg, id: uuidv4() })),
     config: _defaultChatConfig,
     titleSet: true,
   };

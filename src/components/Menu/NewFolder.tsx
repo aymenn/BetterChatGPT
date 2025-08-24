@@ -2,6 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
 import useStore from '@store/store';
+import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
+import { SupabaseService } from '@services/supabase-service';
 
 import NewFolderIcon from '@icon/NewFolderIcon';
 import { Folder, FolderCollection } from '@type/chat';
@@ -10,6 +12,7 @@ const NewFolder = () => {
   const { t } = useTranslation();
   const generating = useStore((state) => state.generating);
   const setFolders = useStore((state) => state.setFolders);
+  const { user, isAuthenticated } = useSupabaseAuth();
 
   const addFolder = () => {
     let folderIndex = 1;
@@ -39,6 +42,13 @@ const NewFolder = () => {
     });
 
     setFolders({ [id]: newFolder, ...updatedFolders });
+    
+    // Create in Supabase if authenticated
+    if (isAuthenticated && user) {
+      SupabaseService.createFolder(user.id, newFolder).catch(error => {
+        console.error('Error creating folder in Supabase:', error);
+      });
+    }
   };
 
   return (

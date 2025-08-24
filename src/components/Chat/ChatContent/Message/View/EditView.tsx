@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { v4 as uuidv4 } from 'uuid';
 import useStore from '@store/store';
 import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
 import { SupabaseService } from '@services/supabase-service';
@@ -75,8 +76,8 @@ const EditView = ({
     const updatedMessages = updatedChats[currentChatIndex].messages;
     
     if (sticky) {
-      const newMessage = { role: inputRole, content: _content };
-      updatedMessages.push({ role: inputRole, content: _content });
+      const newMessage = { role: inputRole, content: _content, id: uuidv4() };
+      updatedMessages.push(newMessage);
       _setContent('');
       resetTextAreaHeight();
       
@@ -93,9 +94,10 @@ const EditView = ({
       
       // Update existing message in Supabase if authenticated
       if (isAuthenticated && user) {
-        // We need to get the message ID from Supabase to update it
-        // For now, we'll handle this in a future update since we need message IDs
-        console.log('Message updated locally, Supabase sync needed');
+        const messageId = updatedMessages[messageIndex].id;
+        SupabaseService.updateMessage(messageId, { content: _content }).catch(error => {
+          console.error('Error updating message in Supabase:', error);
+        });
       }
       
       setIsEdit(false);
@@ -113,13 +115,14 @@ const EditView = ({
     const updatedMessages = updatedChats[currentChatIndex].messages;
     if (sticky) {
       if (_content !== '') {
-        updatedMessages.push({ role: inputRole, content: _content });
+        const newMessage = { role: inputRole, content: _content, id: uuidv4() };
+        updatedMessages.push(newMessage);
         
         // Save new message to Supabase if authenticated
         if (isAuthenticated && user) {
           const chatId = updatedChats[currentChatIndex].id;
           const messageOrder = updatedMessages.length - 1;
-          SupabaseService.addMessage(chatId, { role: inputRole, content: _content }, messageOrder).catch(error => {
+          SupabaseService.addMessage(chatId, newMessage, messageOrder).catch(error => {
             console.error('Error saving message to Supabase:', error);
           });
         }
@@ -128,6 +131,15 @@ const EditView = ({
       resetTextAreaHeight();
     } else {
       updatedMessages[messageIndex].content = _content;
+      
+      // Update existing message in Supabase if authenticated
+      if (isAuthenticated && user) {
+        const messageId = updatedMessages[messageIndex].id;
+        SupabaseService.updateMessage(messageId, { content: _content }).catch(error => {
+          console.error('Error updating message in Supabase:', error);
+        });
+      }
+      
       updatedChats[currentChatIndex].messages = updatedMessages.slice(
         0,
         messageIndex + 1

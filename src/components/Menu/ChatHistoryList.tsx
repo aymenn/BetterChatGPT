@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import useStore from '@store/store';
 import { shallow } from 'zustand/shallow';
+import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
+import { SupabaseService } from '@services/supabase-service';
 
 import ChatFolder from './ChatFolder';
 import ChatHistory from './ChatHistory';
@@ -17,6 +19,7 @@ const ChatHistoryList = () => {
   const currentChatIndex = useStore((state) => state.currentChatIndex);
   const setChats = useStore((state) => state.setChats);
   const setFolders = useStore((state) => state.setFolders);
+  const { user, isAuthenticated } = useSupabaseAuth();
   const chatTitles = useStore(
     (state) => state.chats?.map((chat) => chat.title),
     shallow
@@ -137,6 +140,13 @@ const ChatHistoryList = () => {
       );
       delete updatedChats[chatIndex].folder;
       setChats(updatedChats);
+      
+      // Update in Supabase if authenticated
+      if (isAuthenticated && user) {
+        SupabaseService.updateChat(updatedChats[chatIndex].id, { folder_id: null }).catch(error => {
+          console.error('Error removing chat from folder in Supabase:', error);
+        });
+      }
     }
   };
 

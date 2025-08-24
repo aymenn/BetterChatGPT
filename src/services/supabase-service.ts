@@ -96,6 +96,8 @@ export class SupabaseService {
     count_total_tokens?: boolean;
     total_token_used?: TotalTokenUsed;
     prompts?: Prompt[];
+    default_chat_config?: ConfigInterface;
+    default_system_message?: string;
   }) {
     const { data, error } = await supabase
       .from('chatgpt_user_settings')
@@ -103,6 +105,7 @@ export class SupabaseService {
         id: userId,
         ...settings,
         prompts: settings.prompts ? JSON.parse(JSON.stringify(settings.prompts)) : undefined,
+        default_chat_config: settings.default_chat_config ? JSON.parse(JSON.stringify(settings.default_chat_config)) : undefined,
       })
       .select()
       .single();
@@ -202,6 +205,7 @@ export class SupabaseService {
     // Insert messages
     if (chat.messages.length > 0) {
       const messagesData = chat.messages.map((message, index) => ({
+        id: message.id,
         chat_id: chat.id,
         role: message.role,
         content: message.content,

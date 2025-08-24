@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import useStore from '@store/store';
+import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
+import { SupabaseService } from '@services/supabase-service';
 
 import DownChevronArrow from '@icon/DownChevronArrow';
 import { ChatInterface, Role, roles } from '@type/chat';
@@ -21,6 +23,7 @@ const RoleSelector = React.memo(
     const setInputRole = useStore((state) => state.setInputRole);
     const setChats = useStore((state) => state.setChats);
     const currentChatIndex = useStore((state) => state.currentChatIndex);
+    const { user, isAuthenticated } = useSupabaseAuth();
 
     const [dropDown, setDropDown, dropDownRef] = useHideOnOutsideClick();
 
@@ -54,9 +57,17 @@ const RoleSelector = React.memo(
                     const updatedChats: ChatInterface[] = JSON.parse(
                       JSON.stringify(useStore.getState().chats)
                     );
+                    const messageId = updatedChats[currentChatIndex].messages[messageIndex].id;
                     updatedChats[currentChatIndex].messages[messageIndex].role =
                       r;
                     setChats(updatedChats);
+                    
+                    // Update role in Supabase if authenticated
+                    if (isAuthenticated && user) {
+                      SupabaseService.updateMessage(messageId, { role: r }).catch(error => {
+                        console.error('Error updating message role in Supabase:', error);
+                      });
+                    }
                   } else {
                     setInputRole(r);
                   }

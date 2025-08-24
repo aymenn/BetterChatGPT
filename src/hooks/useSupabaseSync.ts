@@ -106,71 +106,21 @@ export const useSupabaseSync = () => {
         setCountTotalTokens(settingsData.count_total_tokens ?? true);
         setTotalTokenUsed(settingsData.total_token_used as any);
         setPrompts(settingsData.prompts as any);
+        
+        // Load default chat settings
+        const setDefaultChatConfig = useStore((state) => state.setDefaultChatConfig);
+        const setDefaultSystemMessage = useStore((state) => state.setDefaultSystemMessage);
+        if (settingsData.default_chat_config) {
+          setDefaultChatConfig(settingsData.default_chat_config as any);
+        }
+        if (settingsData.default_system_message) {
+          setDefaultSystemMessage(settingsData.default_system_message);
+        }
       }
     } catch (error) {
       console.error('Error loading user data:', error);
     } finally {
       setLoadingUserData(false);
-    }
-  };
-
-  // Migrate localStorage data to Supabase
-  const migrateLocalStorageData = async () => {
-    if (!user) return;
-
-    try {
-      // Check if user already has data in Supabase (only check chats, not profile)
-      const { data: existingChats } = await SupabaseService.getChats(user.id);
-      if (existingChats && existingChats.length > 0) {
-        return; // User already has data, skip migration
-      }
-
-      // Get data from localStorage
-      const localData = localStorage.getItem('free-chat-gpt');
-      if (!localData) return;
-
-      const parsedData = JSON.parse(localData);
-      const state = parsedData.state;
-
-      // Migrate folders
-      if (state.folders) {
-        for (const folder of Object.values(state.folders) as any[]) {
-          await SupabaseService.createFolder(user.id, folder);
-        }
-      }
-
-      // Migrate chats
-      if (state.chats) {
-        for (const chat of state.chats) {
-          await SupabaseService.createChat(user.id, chat);
-        }
-      }
-
-      // Migrate user settings
-      const { error: settingsError } = await SupabaseService.upsertUserSettings(user.id, {
-        theme: state.theme,
-        auto_title: state.autoTitle,
-        advanced_mode: state.advancedMode,
-        hide_menu_options: state.hideMenuOptions,
-        hide_side_menu: state.hideSideMenu,
-        enter_to_submit: state.enterToSubmit,
-        inline_latex: state.inlineLatex,
-        markdown_mode: state.markdownMode,
-        count_total_tokens: state.countTotalTokens,
-        total_token_used: state.totalTokenUsed,
-        prompts: state.prompts,
-      });
-      
-      if (settingsError) {
-        console.error('Error migrating user settings:', settingsError);
-      }
-
-      // Clear localStorage after successful migration
-      localStorage.removeItem('free-chat-gpt');
-      
-      console.log('Successfully migrated localStorage data to Supabase');
-    } catch (error) {
-      console.error('Error migrating localStorage data:', error);
     }
   };
 
@@ -189,9 +139,8 @@ export const useSupabaseSync = () => {
       return;
     }
 
-    // Load initial data and migrate if needed
+    // Load initial data
     const initializeData = async () => {
-      await migrateLocalStorageData();
       await loadUserData();
     };
     initializeData();
@@ -221,7 +170,6 @@ export const useSupabaseSync = () => {
 
   return {
     loadUserData,
-    migrateLocalStorageData,
     loadingUserData,
   };
 };

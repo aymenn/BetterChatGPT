@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import useStore from '@store/store';
+import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
+import { SupabaseService } from '@services/supabase-service';
 
 import DownChevronArrow from '@icon/DownChevronArrow';
 import FolderIcon from '@icon/FolderIcon';
@@ -32,6 +34,7 @@ const ChatFolder = ({
   const folderName = useStore((state) => state.folders[folderId]?.name);
   const isExpanded = useStore((state) => state.folders[folderId]?.expanded);
   const color = useStore((state) => state.folders[folderId]?.color);
+  const { user, isAuthenticated } = useSupabaseAuth();
 
   const setChats = useStore((state) => state.setChats);
   const setFolders = useStore((state) => state.setFolders);
@@ -54,6 +57,13 @@ const ChatFolder = ({
     updatedFolders[folderId].name = _folderName;
     setFolders(updatedFolders);
     setIsEdit(false);
+    
+    // Update in Supabase if authenticated
+    if (isAuthenticated && user) {
+      SupabaseService.updateFolder(folderId, { name: _folderName }).catch(error => {
+        console.error('Error updating folder name in Supabase:', error);
+      });
+    }
   };
 
   const deleteFolder = () => {
@@ -72,6 +82,25 @@ const ChatFolder = ({
     setFolders(updatedFolders);
 
     setIsDelete(false);
+    
+    // Delete from Supabase and update affected chats if authenticated
+    if (isAuthenticated && user) {
+      const deleteFromSupabase = async () => {
+        try {
+          // Update chats to remove folder reference
+          const chatsToUpdate = updatedChats.filter(chat => chat.folder === folderId);
+          for (const chat of chatsToUpdate) {
+            await SupabaseService.updateChat(chat.id, { folder_id: null });
+          }
+          
+          // Delete the folder
+          await SupabaseService.deleteFolder(folderId);
+        } catch (error) {
+          console.error('Error deleting folder from Supabase:', error);
+        }
+      };
+      deleteFromSupabase();
+    }
   };
 
   const updateColor = (_color?: string) => {
@@ -82,6 +111,13 @@ const ChatFolder = ({
     else delete updatedFolders[folderId].color;
     setFolders(updatedFolders);
     setShowPalette(false);
+    
+    // Update in Supabase if authenticated
+    if (isAuthenticated && user) {
+      SupabaseService.updateFolder(folderId, { color: _color || null }).catch(error => {
+        console.error('Error updating folder color in Supabase:', error);
+      });
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -122,6 +158,13 @@ const ChatFolder = ({
       );
       updatedChats[chatIndex].folder = folderId;
       setChats(updatedChats);
+      
+      // Update in Supabase if authenticated
+      if (isAuthenticated && user) {
+        SupabaseService.updateChat(updatedChats[chatIndex].id, { folder_id: folderId }).catch(error => {
+          console.error('Error updating chat folder in Supabase:', error);
+        });
+      }
     }
   };
 
