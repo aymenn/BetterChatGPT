@@ -48,11 +48,13 @@ export class SupabaseService {
   }
 
   static async getUserProfile(userId: string) {
+    console.log('Fetching user profile for ID:', userId);
     const { data, error } = await supabase
       .from('chatgpt_user_profiles')
       .select('*')
       .eq('id', userId)
       .single();
+    console.log('Fetched user profile:', data, 'Error:', error);
     return { data, error };
   }
 
@@ -231,10 +233,12 @@ export class SupabaseService {
   }
 
   static async deleteChat(chatId: string) {
+    console.log('Deleting chat with ID:', chatId);
     const { error } = await supabase
       .from('chatgpt_chats')
       .delete()
       .eq('id', chatId);
+      console.log('Delete chat error:', error);
     return { error };
   }
 

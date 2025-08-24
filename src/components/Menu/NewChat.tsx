@@ -9,7 +9,7 @@ import useAddChat from '@hooks/useAddChat';
 
 const NewChat = ({ folder }: { folder?: string }) => {
   const { t } = useTranslation();
-  const addChat = useAddChat();
+  const { addChat } = useAddChat();
   const generating = useStore((state) => state.generating);
 
   return (
@@ -22,6 +22,7 @@ const NewChat = ({ folder }: { folder?: string }) => {
         folder ? 'justify-start' : 'py-2 px-2 gap-3 mb-2 border border-white/20'
       }`}
       onClick={() => {
+        console.log('NewChat clicked: ', generating);
         if (!generating) addChat(folder);
       }}
       title={folder ? String(t('newChat')) : ''}

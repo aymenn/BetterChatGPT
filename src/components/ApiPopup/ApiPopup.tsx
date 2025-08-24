@@ -4,6 +4,7 @@ import { useTranslation, Trans } from 'react-i18next';
 
 import PopupModal from '@components/PopupModal';
 import CrossIcon from '@icon/CrossIcon';
+import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
 
 const ApiPopup = () => {
   const { t } = useTranslation(['main', 'api']);

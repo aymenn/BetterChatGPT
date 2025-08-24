@@ -13,7 +13,7 @@ import DownloadChat from './DownloadChat';
 import CloneChat from './CloneChat';
 import ShareGPT from '@components/ShareGPT';
 
-const ChatContent = () => {
+const ChatContent = ({ followButtonClassName = 'hidden' }) => {
   const inputRole = useStore((state) => state.inputRole);
   const setError = useStore((state) => state.setError);
   const messages = useStore((state) =>
@@ -51,7 +51,7 @@ const ChatContent = () => {
     <div className='flex-1 overflow-hidden'>
       <ScrollToBottom
         className='h-full dark:bg-gray-800'
-        followButtonClassName='hidden'
+        followButtonClassName={followButtonClassName}
       >
         <ScrollToBottomButton />
         <div className='flex flex-col items-center text-sm dark:bg-gray-800'>

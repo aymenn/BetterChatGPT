@@ -8,7 +8,7 @@ export interface InputSlice {
 
 export const createInputSlice: StoreSlice<InputSlice> = (set, get) => ({
   inputRole: 'user',
-  setInputRole: (inputRole: Role) => {
+  setInputRole: (inputRole: Role = 'user') => {
     set((prev: InputSlice) => ({
       ...prev,
       inputRole: inputRole,

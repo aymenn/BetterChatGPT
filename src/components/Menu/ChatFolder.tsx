@@ -303,6 +303,7 @@ const ChatFolder = ({
           folderChats.map((chat) => (
             <ChatHistory
               title={chat.title}
+              chatId={chat.id}
               chatIndex={chat.index}
               key={`${chat.title}-${chat.index}`}
             />

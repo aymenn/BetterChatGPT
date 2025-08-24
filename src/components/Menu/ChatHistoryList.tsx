@@ -173,7 +173,7 @@ const ChatHistoryList = () => {
           />
         ))}
         {noChatFolders.map(({ title, index, id }) => (
-          <ChatHistory title={title} key={`${title}-${id}`} chatIndex={index} />
+          <ChatHistory title={title} key={`${title}-${id}`} chatId={id} chatIndex={index} />
         ))}
       </div>
       <div className='w-full h-10' />
