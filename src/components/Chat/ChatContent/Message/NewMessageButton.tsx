@@ -38,6 +38,7 @@ const NewMessageButton = React.memo(
           JSON.stringify(useStore.getState().chats)
         );
         updatedChats[currentChatIndex].messages.splice(messageIndex + 1, 0, {
+          id: crypto.randomUUID(),
           content: '',
           role: 'user',
         });

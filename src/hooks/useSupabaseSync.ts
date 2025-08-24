@@ -28,6 +28,10 @@ export const useSupabaseSync = () => {
   const setTotalTokenUsed = useStore((state) => state.setTotalTokenUsed);
   const setPrompts = useStore((state) => state.setPrompts);
 
+  const setDefaultChatConfig = useStore((state) => state.setDefaultChatConfig);
+  const setDefaultSystemMessage = useStore((state) => state.setDefaultSystemMessage);
+
+
   // Load initial data from Supabase
   const loadUserData = async () => {
     if (!user) return;
@@ -81,7 +85,8 @@ export const useSupabaseSync = () => {
           config: chat.config as any,
           messages: ((chat.chatgpt_messages || []) as ChatGPTMessage[])
             .sort((a: ChatGPTMessage, b: ChatGPTMessage) => a.message_order - b.message_order)
-            .map((msg: ChatGPTMessage) => ({
+            .map((msg: ChatGPTMessage, idx: number) => ({
+              id: `${chat.id}-msg-${idx}`,
               role: msg.role as import('@type/chat').Role,
               content: msg.content,
             })),
@@ -108,8 +113,6 @@ export const useSupabaseSync = () => {
         setPrompts(settingsData.prompts as any);
         
         // Load default chat settings
-        const setDefaultChatConfig = useStore((state) => state.setDefaultChatConfig);
-        const setDefaultSystemMessage = useStore((state) => state.setDefaultSystemMessage);
         if (settingsData.default_chat_config) {
           setDefaultChatConfig(settingsData.default_chat_config as any);
         }

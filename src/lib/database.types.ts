@@ -181,6 +181,8 @@ export type Database = {
           auto_title: boolean | null
           count_total_tokens: boolean | null
           created_at: string | null
+          default_chat_config: Json | null
+          default_system_message: string | null
           enter_to_submit: boolean | null
           hide_menu_options: boolean | null
           hide_side_menu: boolean | null
@@ -197,6 +199,8 @@ export type Database = {
           auto_title?: boolean | null
           count_total_tokens?: boolean | null
           created_at?: string | null
+          default_chat_config?: Json | null
+          default_system_message?: string | null
           enter_to_submit?: boolean | null
           hide_menu_options?: boolean | null
           hide_side_menu?: boolean | null
@@ -213,6 +217,8 @@ export type Database = {
           auto_title?: boolean | null
           count_total_tokens?: boolean | null
           created_at?: string | null
+          default_chat_config?: Json | null
+          default_system_message?: string | null
           enter_to_submit?: boolean | null
           hide_menu_options?: boolean | null
           hide_side_menu?: boolean | null

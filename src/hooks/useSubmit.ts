@@ -60,9 +60,12 @@ const useSubmit = () => {
 
     const updatedChats: ChatInterface[] = JSON.parse(JSON.stringify(chats));
 
+    // Import uuidv4 at the top if not already imported
+    // import { v4 as uuidv4 } from 'uuid';
     updatedChats[currentChatIndex].messages.push({
       role: 'assistant',
       content: '',
+      id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15),
     });
 
     setChats(updatedChats);
@@ -187,6 +190,7 @@ const useSubmit = () => {
         const message: MessageInterface = {
           role: 'user',
           content: `Generate a title in less than 6 words for the following message (language: ${i18n.language}):\n"""\nUser: ${user_message}\nAssistant: ${assistant_message}\n"""`,
+          id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15),
         };
 
         let title = (await generateTitle([message])).trim();
@@ -206,6 +210,7 @@ const useSubmit = () => {
           updateTotalTokenUsed(model, [message], {
             role: 'assistant',
             content: title,
+            id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15),
           });
         }
 

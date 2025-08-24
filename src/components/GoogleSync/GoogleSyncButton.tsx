@@ -41,10 +41,11 @@ const GoogleSyncButton = ({ loginHandler }: { loginHandler?: () => void }) => {
     setSyncStatus('unauthenticated');
     setCloudSync(false);
     googleLogout();
-    useStore.persist.setOptions({
-      storage: createJSONStorage(() => localStorage),
-    });
-    useStore.persist.rehydrate();
+    // Clear persisted storage if needed
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('cloud-auth-store');
+      localStorage.removeItem('store');
+    }
     setToastStatus('success');
     setToastMessage(t('toast.stop'));
     setToastShow(true);

@@ -114,7 +114,7 @@ const ChatFolder = ({
     
     // Update in Supabase if authenticated
     if (isAuthenticated && user) {
-      SupabaseService.updateFolder(folderId, { color: _color || null }).catch(error => {
+      SupabaseService.updateFolder(folderId, { color: _color ?? undefined }).catch(error => {
         console.error('Error updating folder color in Supabase:', error);
       });
     }

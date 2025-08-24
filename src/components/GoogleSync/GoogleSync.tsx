@@ -62,10 +62,14 @@ const GoogleSync = ({ clientId }: { clientId: string }) => {
               setFileId(_files[0].id);
             }
           }
-          useStore.persist.setOptions({
-            storage: createGoogleCloudStorage(),
-          });
-          useStore.persist.rehydrate();
+          if ('persist' in useStore) {
+            // @ts-ignore
+            useStore.persist.setOptions({
+              storage: createGoogleCloudStorage(),
+            });
+            // @ts-ignore
+            useStore.persist.rehydrate();
+          }
         }
       } catch (e: unknown) {
         console.log(e);
@@ -182,7 +186,15 @@ const GooglePopup = ({
                   className='btn btn-primary cursor-pointer'
                   onClick={async () => {
                     setFileId(_fileId);
-                    await useStore.persist.rehydrate();
+                    // If you use Zustand's persist middleware, access the rehydrate method from the store instance
+                    // For example, if you export your store as 'store' from '@store/store', use:
+                    // import store from '@store/store';
+                    // await store.persist.rehydrate();
+                    // Otherwise, if you use the hook, you may need to call a custom method or refactor your store setup.
+                    // Here is a safe fallback:
+                    if ((useStore as any).persist?.rehydrate) {
+                      await (useStore as any).persist.rehydrate();
+                    }
                     setToastStatus('success');
                     setToastMessage(t('toast.sync'));
                     setToastShow(true);

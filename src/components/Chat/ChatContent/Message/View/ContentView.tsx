@@ -32,6 +32,7 @@ import DeleteButton from './Button/DeleteButton';
 import MarkdownModeButton from './Button/MarkdownModeButton';
 
 import CodeBlock from '../CodeBlock';
+import { SupabaseService } from '@src/services/supabase-service';
 
 const ContentView = memo(
   ({

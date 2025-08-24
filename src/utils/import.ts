@@ -105,7 +105,7 @@ export const convertOpenAIToBetterChatGPTFormat = (
     if (node.message) {
       const { role } = node.message.author;
       const content = node.message.content.parts?.join('') || '';
-      if (content.length > 0) messages.push({ role, content });
+      if (content.length > 0) messages.push({ role, content, id: uuidv4() });
     }
 
     // Traverse the last child node if any children exist
