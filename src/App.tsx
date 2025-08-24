@@ -36,12 +36,13 @@ function App() {
 
   useEffect(() => {
     // Show auth modal if not authenticated and not loading
+    console.log('Auth status changed:', { loading, isAuthenticated });
     if (!loading && !isAuthenticated) {
       setShowAuthModal(true);
     } else {
       setShowAuthModal(false);
     }
-  }, [loading, isAuthenticated]);
+  }, [loading, isAuthenticated, loadingUserData]);
 
   useEffect(() => {
     // legacy local storage
@@ -93,6 +94,7 @@ function App() {
   }, []);
 
   // Show loading spinner while checking authentication or loading user data
+  console.log('Are we loading? ', { loading, loadingUserData, isAuthenticated });
   if (loading || (isAuthenticated && loadingUserData)) {
     return (
       <div className='flex items-center justify-center h-screen bg-gray-900'>

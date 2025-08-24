@@ -31,18 +31,60 @@ export const useSupabaseAuth = () => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setUser(session?.user ?? null);
-        setIsAuthenticated(!!session?.user);
-        
-        if (session?.user) {
-          await loadUserProfile(session.user.id);
-        } else {
-          // Clear user data on logout
-          setApiKey('');
-          setApiEndpoint('https://api.openai.com/v1/chat/completions');
-        }
-        
-        setLoading(false);
+
+        switch (event) {
+            case "INITIAL_SESSION":
+                console.log('Auth event:', event, session);
+                setUser(session?.user ?? null);
+                setIsAuthenticated(!!session?.user);
+                
+                if (session?.user) {
+                  await loadUserProfile(session.user.id);
+                } else {
+                  // Clear user data on logout
+                  setApiKey('');
+                  setApiEndpoint('https://api.openai.com/v1/chat/completions');
+                }
+                
+                setLoading(false);
+
+              break;
+
+            case "SIGNED_IN":
+              if (session?.user?.id !== user?.id) {
+                if (session?.user) {
+                  await loadUserProfile(session.user.id);
+                } else {
+                  // Clear user data on logout
+                  setApiKey('');
+                  setApiEndpoint('https://api.openai.com/v1/chat/completions');
+                }
+                
+                setLoading(false);
+              }
+              break;
+
+            case "SIGNED_OUT":
+              setUser(null);
+              // Clear user data on logout
+              setApiKey('');
+              setApiEndpoint('https://api.openai.com/v1/chat/completions');
+              break;
+
+            case "TOKEN_REFRESHED":
+              //updateApiToken(session?.access_token);
+              break;
+
+            case "USER_UPDATED":
+              if (session?.user) {
+                await loadUserProfile(session.user.id);
+              }
+              break;
+
+            case "PASSWORD_RECOVERY":
+              //navigate("/reset-password");
+              break;
+          }
       }
     );
 

@@ -34,6 +34,7 @@ export const useSupabaseSync = () => {
 
   // Load initial data from Supabase
   const loadUserData = async () => {
+    console.log('Loading user data from Supabase...', user);
     if (!user) return;
 
     setLoadingUserData(true);
@@ -54,6 +55,7 @@ export const useSupabaseSync = () => {
         setFolders(folders);
       }
 
+      console.log('Folders loaded');
       // Load chats with messages
       const { data: chatsData } = await SupabaseService.getChats(user.id);
       if (chatsData) {
@@ -96,7 +98,7 @@ export const useSupabaseSync = () => {
           setCurrentChatIndex(0);
         }
       }
-
+      console.log('Chats loaded');
       // Load user settings
       const { data: settingsData } = await SupabaseService.getUserSettings(user.id);
       if (settingsData) {
@@ -120,9 +122,11 @@ export const useSupabaseSync = () => {
           setDefaultSystemMessage(settingsData.default_system_message);
         }
       }
+      console.log('Settings loaded');
     } catch (error) {
       console.error('Error loading user data:', error);
     } finally {
+      console.log('Finished loading user data');
       setLoadingUserData(false);
     }
   };
