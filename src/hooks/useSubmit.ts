@@ -152,7 +152,8 @@ const useSubmit = () => {
       if (isAuthenticated && user) {
         const assistantMessage = useStore.getState().chats?.[currentChatIndex].messages.slice(-1)[0];
         if (assistantMessage && assistantMessage.role === 'assistant') {
-          const messageOrder = useStore.getState().chats?.[currentChatIndex].messages.length - 1;
+          const messagesArr = useStore.getState().chats?.[currentChatIndex].messages;
+          const messageOrder = messagesArr ? messagesArr.length - 1 : 0;
           await SupabaseService.addMessage(chats[currentChatIndex].id, assistantMessage, messageOrder);
         }
       }

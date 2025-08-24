@@ -6,7 +6,7 @@ import SpinnerIcon from '@icon/SpinnerIcon';
 
 interface AuthModalProps {
   isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, setIsOpen }) => {

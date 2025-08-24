@@ -102,6 +102,7 @@ export class SupabaseService {
       .upsert({
         id: userId,
         ...settings,
+        prompts: settings.prompts ? JSON.parse(JSON.stringify(settings.prompts)) : undefined,
       })
       .select()
       .single();
@@ -191,7 +192,7 @@ export class SupabaseService {
         folder_id: chat.folder,
         title: chat.title,
         title_set: chat.titleSet,
-        config: chat.config,
+        config: chat.config ? JSON.parse(JSON.stringify(chat.config)) : null,
       })
       .select()
       .single();
@@ -223,9 +224,13 @@ export class SupabaseService {
     folder_id?: string | null;
     config?: ConfigInterface;
   }) {
+    const updatesWithSerializedConfig = {
+      ...updates,
+      config: updates.config !== undefined ? JSON.parse(JSON.stringify(updates.config)) : undefined,
+    };
     const { data, error } = await supabase
       .from('chatgpt_chats')
-      .update(updates)
+      .update(updatesWithSerializedConfig)
       .eq('id', chatId)
       .select()
       .single();

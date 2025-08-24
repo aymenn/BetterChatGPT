@@ -43,8 +43,8 @@ export const useSupabaseSync = () => {
             id: folder.id,
             name: folder.name,
             color: folder.color || undefined,
-            expanded: folder.expanded,
-            order: folder.folder_order,
+            expanded: folder.expanded ?? true,
+            order: folder.folder_order ?? 0,
           };
         });
         setFolders(folders);
@@ -53,16 +53,36 @@ export const useSupabaseSync = () => {
       // Load chats with messages
       const { data: chatsData } = await SupabaseService.getChats(user.id);
       if (chatsData) {
-        const chats: ChatInterface[] = chatsData.map(chat => ({
+        interface ChatGPTMessage {
+          role: string;
+          content: string;
+          message_order: number;
+        }
+
+        interface ChatData {
+          id: string;
+          title: string;
+          folder_id?: string | null;
+          title_set?: boolean | null;
+          config: unknown;
+          chatgpt_messages?: ChatGPTMessage[];
+        }
+
+        interface Message {
+          role: string;
+          content: string;
+        }
+
+        const chats: ChatInterface[] = (chatsData as ChatData[]).map((chat: ChatData) => ({
           id: chat.id,
           title: chat.title,
           folder: chat.folder_id || undefined,
-          titleSet: chat.title_set,
+          titleSet: chat.title_set ?? false,
           config: chat.config as any,
-          messages: ((chat as any).chatgpt_messages || [])
-            .sort((a, b) => a.message_order - b.message_order)
-            .map(msg => ({
-              role: msg.role,
+          messages: ((chat.chatgpt_messages || []) as ChatGPTMessage[])
+            .sort((a: ChatGPTMessage, b: ChatGPTMessage) => a.message_order - b.message_order)
+            .map((msg: ChatGPTMessage) => ({
+              role: msg.role as import('@type/chat').Role,
               content: msg.content,
             })),
         }));
@@ -76,14 +96,14 @@ export const useSupabaseSync = () => {
       const { data: settingsData } = await SupabaseService.getUserSettings(user.id);
       if (settingsData) {
         setTheme(settingsData.theme as any);
-        setAutoTitle(settingsData.auto_title);
-        setAdvancedMode(settingsData.advanced_mode);
-        setHideMenuOptions(settingsData.hide_menu_options);
-        setHideSideMenu(settingsData.hide_side_menu);
-        setEnterToSubmit(settingsData.enter_to_submit);
-        setInlineLatex(settingsData.inline_latex);
-        setMarkdownMode(settingsData.markdown_mode);
-        setCountTotalTokens(settingsData.count_total_tokens);
+        setAutoTitle(settingsData.auto_title ?? false);
+        setAdvancedMode(settingsData.advanced_mode ?? false);
+        setHideMenuOptions(settingsData.hide_menu_options ?? false);
+        setHideSideMenu(settingsData.hide_side_menu ?? false);
+        setEnterToSubmit(settingsData.enter_to_submit ?? true);
+        setInlineLatex(settingsData.inline_latex ?? false);
+        setMarkdownMode(settingsData.markdown_mode ?? true);
+        setCountTotalTokens(settingsData.count_total_tokens ?? true);
         setTotalTokenUsed(settingsData.total_token_used as any);
         setPrompts(settingsData.prompts as any);
       }
