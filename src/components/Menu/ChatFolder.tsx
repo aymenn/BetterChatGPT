@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import useStore from '@store/store';
-import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
 import { SupabaseService } from '@services/supabase-service';
 
 import DownChevronArrow from '@icon/DownChevronArrow';
@@ -23,6 +22,7 @@ import RefreshIcon from '@icon/RefreshIcon';
 import { folderColorOptions } from '@constants/color';
 
 import useHideOnOutsideClick from '@hooks/useHideOnOutsideClick';
+import { useAuth } from '@components/Auth/AuthProvider';
 
 const ChatFolder = ({
   folderChats,
@@ -34,7 +34,7 @@ const ChatFolder = ({
   const folderName = useStore((state) => state.folders[folderId]?.name);
   const isExpanded = useStore((state) => state.folders[folderId]?.expanded);
   const color = useStore((state) => state.folders[folderId]?.color);
-  const { user, isAuthenticated } = useSupabaseAuth();
+  const { user, isAuthenticated } = useAuth();
 
   const setChats = useStore((state) => state.setChats);
   const setFolders = useStore((state) => state.setFolders);

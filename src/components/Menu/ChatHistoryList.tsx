@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import useStore from '@store/store';
 import { shallow } from 'zustand/shallow';
-import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
 import { SupabaseService } from '@services/supabase-service';
 
 import ChatFolder from './ChatFolder';
@@ -14,12 +13,13 @@ import {
   ChatInterface,
   FolderCollection,
 } from '@type/chat';
+import { useAuth } from '@components/Auth/AuthProvider';
 
 const ChatHistoryList = () => {
   const currentChatIndex = useStore((state) => state.currentChatIndex);
   const setChats = useStore((state) => state.setChats);
   const setFolders = useStore((state) => state.setFolders);
-  const { user, isAuthenticated } = useSupabaseAuth();
+  const { user, isAuthenticated } = useAuth();
   const chatTitles = useStore(
     (state) => state.chats?.map((chat) => chat.title),
     shallow

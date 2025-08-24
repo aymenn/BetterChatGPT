@@ -3,10 +3,11 @@ import { RealtimeChannel } from '@supabase/supabase-js';
 import { SupabaseService } from '@services/supabase-service';
 import useStore from '@store/store';
 import { ChatInterface, FolderCollection } from '@type/chat';
-import { useSupabaseAuth } from './useSupabaseAuth';
+import { useAuth } from '@components/Auth/AuthProvider';
+
 
 export const useSupabaseSync = () => {
-  const { user, isAuthenticated } = useSupabaseAuth();
+  const { user, isAuthenticated } = useAuth();
   const channelRef = useRef<RealtimeChannel | null>(null);
   const settingsChannelRef = useRef<RealtimeChannel | null>(null);
   const [loadingUserData, setLoadingUserData] = useState(false);

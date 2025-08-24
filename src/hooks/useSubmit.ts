@@ -7,12 +7,12 @@ import { parseEventSource } from '@api/helper';
 import { limitMessageTokens, updateTotalTokenUsed } from '@utils/messageUtils';
 import { _defaultChatConfig } from '@constants/chat';
 import { officialAPIEndpoint } from '@constants/auth';
-import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
 import { SupabaseService } from '@services/supabase-service';
+import { useAuth } from '@components/Auth/AuthProvider';
 
 const useSubmit = () => {
   const { t, i18n } = useTranslation('api');
-  const { user, isAuthenticated } = useSupabaseAuth();
+  const { user, isAuthenticated } = useAuth();
   const error = useStore((state) => state.error);
   const setError = useStore((state) => state.setError);
   const apiEndpoint = useStore((state) => state.apiEndpoint);

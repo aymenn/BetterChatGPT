@@ -1,6 +1,5 @@
 import { defaultAPIEndpoint } from '@constants/auth';
 import { SupabaseService } from '@services/supabase-service';
-import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
 import { StoreSlice } from './store';
 
 export interface AuthSlice {

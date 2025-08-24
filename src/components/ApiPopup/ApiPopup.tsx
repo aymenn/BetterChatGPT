@@ -4,12 +4,12 @@ import { useTranslation, Trans } from 'react-i18next';
 
 import PopupModal from '@components/PopupModal';
 import CrossIcon from '@icon/CrossIcon';
-import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
+import { useAuth } from '@components/Auth/AuthProvider';
 
 const ApiPopup = () => {
   const { t } = useTranslation(['main', 'api']);
 
-  const { user, loading: authLoading, isAuthenticated } = useSupabaseAuth();
+  const { user, loading: authLoading, isAuthenticated } = useAuth();
   const apiKey = useStore((state) => state.apiKey);
   const setApiKey = useStore((state) => state.setApiKey);
 

@@ -2,7 +2,6 @@ import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
 import useStore from '@store/store';
-import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
 import { SupabaseService } from '@services/supabase-service';
 
 import useSubmit from '@hooks/useSubmit';
@@ -12,6 +11,7 @@ import { ChatInterface } from '@type/chat';
 import PopupModal from '@components/PopupModal';
 import TokenCount from '@components/TokenCount';
 import CommandPrompt from '../CommandPrompt';
+import { useAuth } from '@components/Auth/AuthProvider';
 
 const EditView = ({
   content,
@@ -25,7 +25,7 @@ const EditView = ({
   sticky?: boolean;
 }) => {
   const inputRole = useStore((state) => state.inputRole);
-  const { user, isAuthenticated } = useSupabaseAuth();
+  const { user, isAuthenticated } = useAuth();
   const setChats = useStore((state) => state.setChats);
   const currentChatIndex = useStore((state) => state.currentChatIndex);
 

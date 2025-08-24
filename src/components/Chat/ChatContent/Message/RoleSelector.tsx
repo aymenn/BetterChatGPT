@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import useStore from '@store/store';
-import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
 import { SupabaseService } from '@services/supabase-service';
 
 import DownChevronArrow from '@icon/DownChevronArrow';
 import { ChatInterface, Role, roles } from '@type/chat';
 
 import useHideOnOutsideClick from '@hooks/useHideOnOutsideClick';
+import { useAuth } from '@components/Auth/AuthProvider';
 
 const RoleSelector = React.memo(
   ({
@@ -23,7 +23,7 @@ const RoleSelector = React.memo(
     const setInputRole = useStore((state) => state.setInputRole);
     const setChats = useStore((state) => state.setChats);
     const currentChatIndex = useStore((state) => state.currentChatIndex);
-    const { user, isAuthenticated } = useSupabaseAuth();
+    const { user, isAuthenticated } = useAuth();
 
     const [dropDown, setDropDown, dropDownRef] = useHideOnOutsideClick();
 

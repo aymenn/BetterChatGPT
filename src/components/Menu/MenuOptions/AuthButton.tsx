@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
 import { AuthModal } from '@components/Auth';
 import PersonIcon from '@icon/PersonIcon';
 import LogoutIcon from '@icon/LogoutIcon';
+import { useAuth } from '@components/Auth/AuthProvider';
 
 const AuthButton = () => {
   const { t } = useTranslation();
-  const { user, signOut, isAuthenticated } = useSupabaseAuth();
+  const { user, signOut, isAuthenticated } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleSignOut = async () => {

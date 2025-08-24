@@ -11,6 +11,7 @@ export const useSupabaseAuth = () => {
 
   const setApiKey = useStore((state) => state.setApiKey);
   const setApiEndpoint = useStore((state) => state.setApiEndpoint);
+const [hasLoadedProfile, setHasLoadedProfile] = useState(false);
 
   useEffect(() => {
     // Get initial session
@@ -19,8 +20,10 @@ export const useSupabaseAuth = () => {
       setUser(session?.user ?? null);
       setIsAuthenticated(!!session?.user);
       
-      if (session?.user) {
-        await loadUserProfile(session.user.id);
+      if (session?.user && !hasLoadedProfile) {
+        console.log('Loading User Profile:', session, hasLoadedProfile);
+
+        await loadUserProfile(session.user.id).finally(() => setHasLoadedProfile(true));
       }
       
       setLoading(false);
@@ -28,13 +31,15 @@ export const useSupabaseAuth = () => {
 
     getInitialSession();
 
+
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
 
+        console.log('Got Auth changed event:', event, session);
+
         switch (event) {
             case "INITIAL_SESSION":
-                console.log('Auth event:', event, session);
                 setUser(session?.user ?? null);
                 setIsAuthenticated(!!session?.user);
                 
@@ -93,6 +98,7 @@ export const useSupabaseAuth = () => {
 
   const loadUserProfile = async (userId: string) => {
     try {
+      console.log('Fetching profile for user ID:', userId);
       const { data: profile, error } = await SupabaseService.getUserProfile(userId);
       
       // If profile doesn't exist (error or no data), create it for existing users

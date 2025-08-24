@@ -1,13 +1,13 @@
 import React from 'react';
 import { useState } from 'react';
 import useStore from '@store/store';
-import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
 import { SupabaseService } from '@services/supabase-service';
 import { generateDefaultChat } from '@constants/chat';
 import { ChatInterface } from '@type/chat';
+import { useAuth } from '@components/Auth/AuthProvider';
 
 const useAddChat = () => {
-  const { user } = useSupabaseAuth();
+  const { user } = useAuth();
   const setChats = useStore((state) => state.setChats);
   const setCurrentChatIndex = useStore((state) => state.setCurrentChatIndex);
   const [isCreatingChat, setIsCreatingChat] = useState(false);

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
 import PopupModal from '@components/PopupModal';
 import SpinnerIcon from '@icon/SpinnerIcon';
+import { useAuth } from './AuthProvider';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -11,7 +11,7 @@ interface AuthModalProps {
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, setIsOpen }) => {
   const { t } = useTranslation();
-  const { signIn, signUp, loading } = useSupabaseAuth();
+  const { signIn, signUp, loading } = useAuth();
   
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import useStore from '@store/store';
 import i18n from './i18n';
-import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
 import { useSupabaseSync } from '@hooks/useSupabaseSync';
 import { AuthModal } from '@components/Auth';
 
@@ -14,9 +13,10 @@ import { Theme } from '@type/theme';
 import ApiPopup from '@components/ApiPopup';
 import Toast from '@components/Toast';
 import SpinnerIcon from '@icon/SpinnerIcon';
+import { useAuth } from '@components/Auth/AuthProvider';
 
 function App() {
-  const { user, loading, isAuthenticated } = useSupabaseAuth();
+  const { user, loading, isAuthenticated } = useAuth();
   const { loadingUserData } = useSupabaseSync();
   
   const initialiseNewChat = useInitialiseNewChat();
@@ -36,7 +36,7 @@ function App() {
 
   useEffect(() => {
     // Show auth modal if not authenticated and not loading
-    console.log('Auth status changed:', { loading, isAuthenticated });
+    console.log('In App.useEffect:', { loading, isAuthenticated, loadingUserData });
     if (!loading && !isAuthenticated) {
       setShowAuthModal(true);
     } else {

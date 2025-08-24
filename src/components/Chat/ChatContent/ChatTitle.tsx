@@ -5,8 +5,8 @@ import useStore from '@store/store';
 import ConfigMenu from '@components/ConfigMenu';
 import { ChatInterface, ConfigInterface } from '@type/chat';
 import { _defaultChatConfig } from '@constants/chat';
-import { useSupabaseAuth } from '@hooks/useSupabaseAuth';
 import { SupabaseService } from '@src/services/supabase-service';
+import { useAuth } from '@components/Auth/AuthProvider';
 
 const ChatTitle = React.memo(() => {
   const { t } = useTranslation('model');
@@ -23,7 +23,7 @@ const ChatTitle = React.memo(() => {
   const setChats = useStore((state) => state.setChats);
   const currentChatIndex = useStore((state) => state.currentChatIndex);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const { user, isAuthenticated } = useSupabaseAuth();
+  const { user, isAuthenticated } = useAuth()
 
   const setConfig = async (config: ConfigInterface) => {
     const updatedChats: ChatInterface[] = JSON.parse(
