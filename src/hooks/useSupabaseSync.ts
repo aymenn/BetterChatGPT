@@ -135,7 +135,7 @@ export const useSupabaseSync = () => {
     channelRef.current = SupabaseService.subscribeToUserChats(userRef.current.id, async (payload) => {
       console.log('Real-time update:', payload);
       // Reload data when changes occur
-      await loadUserData();
+      //await loadUserData();
     });
 
     // Setup real-time subscription for settings
