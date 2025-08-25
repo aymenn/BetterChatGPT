@@ -7,7 +7,7 @@ import { ChatInterface } from '@type/chat';
 import { useAuth } from '@components/Auth/AuthProvider';
 
 const useAddChat = () => {
-  const { user } = useAuth();
+  const { userRef } = useAuth();
   const setChats = useStore((state) => state.setChats);
   const setCurrentChatIndex = useStore((state) => state.setCurrentChatIndex);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
@@ -37,9 +37,9 @@ const useAddChat = () => {
         setCurrentChatIndex(0);
         
         // Save to Supabase if user is authenticated
-        if (user) {
+        if (userRef.current) {
           try {
-            await SupabaseService.createChat(user.id, newChat);
+            await SupabaseService.createChat(userRef.current.id, newChat);
             console.log('Chat saved to Supabase successfully');
           } catch (error) {
             console.error('Error creating chat in Supabase:', error);

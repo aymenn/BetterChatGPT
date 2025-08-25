@@ -3,7 +3,7 @@ import React, { createContext, useContext } from 'react';
 
 
 interface AuthContextType {
-  user: any | null;
+  userRef: any | null;
   loading: boolean;
   isAuthenticated: boolean;
   signUp: (email: string, password: string) => Promise<any>;

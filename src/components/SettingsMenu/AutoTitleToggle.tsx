@@ -13,7 +13,10 @@ const AutoTitleToggle = () => {
   );
 
   useEffect(() => {
-    setAutoTitle(isChecked);
+    if (isChecked !== useStore.getState().autoTitle) {
+      console.log('AutoTitle changed:', isChecked);
+      setAutoTitle(isChecked);
+    }
   }, [isChecked]);
 
   return (

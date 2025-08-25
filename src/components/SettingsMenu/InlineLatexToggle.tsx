@@ -13,7 +13,10 @@ const InlineLatexToggle = () => {
   );
 
   useEffect(() => {
-    setInlineLatex(isChecked);
+    if (isChecked !== useStore.getState().inlineLatex) {
+      console.log('inlineLatex changed:', isChecked);
+      setInlineLatex(isChecked);
+    }
   }, [isChecked]);
 
   return (

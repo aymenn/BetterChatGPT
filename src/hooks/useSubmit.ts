@@ -12,7 +12,7 @@ import { useAuth } from '@components/Auth/AuthProvider';
 
 const useSubmit = () => {
   const { t, i18n } = useTranslation('api');
-  const { user, isAuthenticated } = useAuth();
+  const { userRef, isAuthenticated } = useAuth();
   const error = useStore((state) => state.error);
   const setError = useStore((state) => state.setError);
   const apiEndpoint = useStore((state) => state.apiEndpoint);
@@ -152,7 +152,7 @@ const useSubmit = () => {
       }
 
       // Save the assistant message to Supabase if authenticated
-      if (isAuthenticated && user) {
+      if (isAuthenticated && userRef.current) {
         const assistantMessage = useStore.getState().chats?.[currentChatIndex].messages.slice(-1)[0];
         if (assistantMessage && assistantMessage.role === 'assistant') {
           const messagesArr = useStore.getState().chats?.[currentChatIndex].messages;
@@ -215,7 +215,7 @@ const useSubmit = () => {
         }
 
         // Save the updated title to Supabase if authenticated
-        if (isAuthenticated && user) {
+        if (isAuthenticated && userRef.current) {
           try {
             await SupabaseService.updateChat(updatedChats[currentChatIndex].id, {
               title: title,

@@ -6,10 +6,12 @@ import { useAuth } from './AuthProvider';
 
 interface AuthModalProps {
   isOpen: boolean;
+  showCrossIcon?: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  handleClickBackdrop?: () => void;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, setIsOpen }) => {
+const AuthModal: React.FC<AuthModalProps> = ({ isOpen, showCrossIcon = true, setIsOpen, handleClickBackdrop = () =>{} }) => {
   const { t } = useTranslation();
   const { signIn, signUp, loading } = useAuth();
   
@@ -50,6 +52,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, setIsOpen }) => {
 
   return (
     <PopupModal
+      showCrossIcon={showCrossIcon}
+      handleClickBackdrop={handleClickBackdrop}
       title={isSignUp ? 'Sign Up' : 'Sign In'}
       setIsModalOpen={setIsOpen}
       cancelButton={false}

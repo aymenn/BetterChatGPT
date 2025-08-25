@@ -7,21 +7,21 @@ import { useAuth } from '@components/Auth/AuthProvider';
 
 const AuthButton = () => {
   const { t } = useTranslation();
-  const { user, signOut, isAuthenticated } = useAuth();
+  const { userRef, signOut, isAuthenticated } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
   };
 
-  if (isAuthenticated && user) {
+  if (isAuthenticated && userRef.current) {
     return (
       <button
         className='flex py-2 px-2 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm'
         onClick={handleSignOut}
       >
         <LogoutIcon />
-        Sign Out ({user.email})
+        Sign Out ({userRef.current.email})
       </button>
     );
   }

@@ -23,7 +23,7 @@ const ChatTitle = React.memo(() => {
   const setChats = useStore((state) => state.setChats);
   const currentChatIndex = useStore((state) => state.currentChatIndex);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const { user, isAuthenticated } = useAuth()
+  const { userRef, isAuthenticated } = useAuth()
 
   const setConfig = async (config: ConfigInterface) => {
     const updatedChats: ChatInterface[] = JSON.parse(
@@ -33,7 +33,7 @@ const ChatTitle = React.memo(() => {
     setChats(updatedChats);
 
     // Save the updated title to Supabase if authenticated
-    if (isAuthenticated && user) {
+    if (isAuthenticated && userRef.current) {
       try {
         await SupabaseService.updateChat(updatedChats[currentChatIndex].id, {
           config: config,

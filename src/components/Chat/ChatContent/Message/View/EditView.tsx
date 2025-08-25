@@ -25,7 +25,7 @@ const EditView = ({
   sticky?: boolean;
 }) => {
   const inputRole = useStore((state) => state.inputRole);
-  const { user, isAuthenticated } = useAuth();
+  const { userRef, isAuthenticated } = useAuth();
   const setChats = useStore((state) => state.setChats);
   const currentChatIndex = useStore((state) => state.currentChatIndex);
 
@@ -82,7 +82,7 @@ const EditView = ({
       resetTextAreaHeight();
       
       // Save new message to Supabase if authenticated
-      if (isAuthenticated && user) {
+      if (isAuthenticated && userRef.current) {
         const chatId = updatedChats[currentChatIndex].id;
         const messageOrder = updatedMessages.length - 1;
         SupabaseService.addMessage(chatId, newMessage, messageOrder).catch(error => {
@@ -93,7 +93,7 @@ const EditView = ({
       updatedMessages[messageIndex].content = _content;
       
       // Update existing message in Supabase if authenticated
-      if (isAuthenticated && user) {
+      if (isAuthenticated && userRef.current) {
         const messageId = updatedMessages[messageIndex].id;
         SupabaseService.updateMessage(messageId, { content: _content }).catch(error => {
           console.error('Error updating message in Supabase:', error);
@@ -119,7 +119,7 @@ const EditView = ({
         updatedMessages.push(newMessage);
         
         // Save new message to Supabase if authenticated
-        if (isAuthenticated && user) {
+        if (isAuthenticated && userRef.current) {
           const chatId = updatedChats[currentChatIndex].id;
           const messageOrder = updatedMessages.length - 1;
           SupabaseService.addMessage(chatId, newMessage, messageOrder).catch(error => {
@@ -133,7 +133,7 @@ const EditView = ({
       updatedMessages[messageIndex].content = _content;
       
       // Update existing message in Supabase if authenticated
-      if (isAuthenticated && user) {
+      if (isAuthenticated && userRef.current) {
         const messageId = updatedMessages[messageIndex].id;
         SupabaseService.updateMessage(messageId, { content: _content }).catch(error => {
           console.error('Error updating message in Supabase:', error);

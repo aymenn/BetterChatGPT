@@ -12,6 +12,7 @@ const PopupModal = ({
   handleClose,
   handleClickBackdrop,
   cancelButton = true,
+  showCrossIcon = true,
   children,
 }: {
   title?: string;
@@ -21,6 +22,7 @@ const PopupModal = ({
   handleClose?: () => void;
   handleClickBackdrop?: () => void;
   cancelButton?: boolean;
+  showCrossIcon?: boolean;
   children?: React.ReactElement;
 }) => {
   const modalRoot = document.getElementById('modal-root');
@@ -67,7 +69,8 @@ const PopupModal = ({
                 onClick={_handleClose}
                 aria-label='close modal'
               >
-                <CrossIcon2 />
+                {showCrossIcon &&
+                <CrossIcon2 />}
               </button>
             </div>
 

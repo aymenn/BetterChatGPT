@@ -9,7 +9,7 @@ import { useAuth } from '@components/Auth/AuthProvider';
 const ApiPopup = () => {
   const { t } = useTranslation(['main', 'api']);
 
-  const { user, loading: authLoading, isAuthenticated } = useAuth();
+  const { userRef, loading: authLoading, isAuthenticated } = useAuth();
   const apiKey = useStore((state) => state.apiKey);
   const setApiKey = useStore((state) => state.setApiKey);
 

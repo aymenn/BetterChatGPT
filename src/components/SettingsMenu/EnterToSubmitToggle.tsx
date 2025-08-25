@@ -13,7 +13,10 @@ const EnterToSubmitToggle = () => {
   );
 
   useEffect(() => {
-    setEnterToSubmit(isChecked);
+    if (isChecked !== useStore.getState().enterToSubmit) {
+      console.log('enterToSubmit changed:', isChecked);
+      setEnterToSubmit(isChecked);
+    }
   }, [isChecked]);
 
   return (

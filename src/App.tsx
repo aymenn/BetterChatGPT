@@ -16,7 +16,7 @@ import SpinnerIcon from '@icon/SpinnerIcon';
 import { useAuth } from '@components/Auth/AuthProvider';
 
 function App() {
-  const { user, loading, isAuthenticated } = useAuth();
+  const { userRef, loading, isAuthenticated } = useAuth();
   const { loadingUserData } = useSupabaseSync();
   
   const initialiseNewChat = useInitialiseNewChat();
@@ -107,6 +107,15 @@ function App() {
       </div>
     );
   }
+
+  if (!isAuthenticated) {
+      return (
+    <div className='overflow-hidden w-full h-full relative'>
+      <AuthModal isOpen={showAuthModal} setIsOpen={setShowAuthModal} showCrossIcon={false} handleClickBackdrop={()=>{}}/>
+    </div>
+  );
+  }
+
   return (
     <div className='overflow-hidden w-full h-full relative'>
       <Menu />

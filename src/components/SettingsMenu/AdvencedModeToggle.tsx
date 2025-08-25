@@ -13,7 +13,10 @@ const AdvancedModeToggle = () => {
   );
 
   useEffect(() => {
-    setAdvancedMode(isChecked);
+    if (isChecked !== useStore.getState().advancedMode) {
+      console.log('advancedMode changed:', isChecked);
+      setAdvancedMode(isChecked);
+    }
   }, [isChecked]);
 
   return (

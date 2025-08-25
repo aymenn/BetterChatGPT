@@ -19,7 +19,7 @@ const ChatHistoryList = () => {
   const currentChatIndex = useStore((state) => state.currentChatIndex);
   const setChats = useStore((state) => state.setChats);
   const setFolders = useStore((state) => state.setFolders);
-  const { user, isAuthenticated } = useAuth();
+  const { userRef, isAuthenticated } = useAuth();
   const chatTitles = useStore(
     (state) => state.chats?.map((chat) => chat.title),
     shallow
@@ -142,7 +142,7 @@ const ChatHistoryList = () => {
       setChats(updatedChats);
       
       // Update in Supabase if authenticated
-      if (isAuthenticated && user) {
+      if (isAuthenticated && userRef.current) {
         SupabaseService.updateChat(updatedChats[chatIndex].id, { folder_id: null }).catch(error => {
           console.error('Error removing chat from folder in Supabase:', error);
         });

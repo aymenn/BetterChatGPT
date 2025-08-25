@@ -12,7 +12,7 @@ const NewFolder = () => {
   const { t } = useTranslation();
   const generating = useStore((state) => state.generating);
   const setFolders = useStore((state) => state.setFolders);
-  const { user, isAuthenticated } = useAuth();
+  const { userRef, isAuthenticated } = useAuth();
 
   const addFolder = () => {
     let folderIndex = 1;
@@ -44,8 +44,8 @@ const NewFolder = () => {
     setFolders({ [id]: newFolder, ...updatedFolders });
     
     // Create in Supabase if authenticated
-    if (isAuthenticated && user) {
-      SupabaseService.createFolder(user.id, newFolder).catch(error => {
+    if (isAuthenticated && userRef.current) {
+      SupabaseService.createFolder(userRef.current.id, newFolder).catch(error => {
         console.error('Error creating folder in Supabase:', error);
       });
     }

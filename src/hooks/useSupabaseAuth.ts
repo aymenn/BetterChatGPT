@@ -1,23 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@lib/supabase';
 import { SupabaseService } from '@services/supabase-service';
 import useStore from '@store/store';
 
 export const useSupabaseAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
+  //const [user, setUser] = useState<User | null>(null);
+  const userRef = useRef<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const setApiKey = useStore((state) => state.setApiKey);
   const setApiEndpoint = useStore((state) => state.setApiEndpoint);
-const [hasLoadedProfile, setHasLoadedProfile] = useState(false);
+  const [hasLoadedProfile, setHasLoadedProfile] = useState(false);
 
   useEffect(() => {
     // Get initial session
     const getInitialSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
+      console.log('Initial session:', session);
+      userRef.current = session?.user ?? null;
       setIsAuthenticated(!!session?.user);
       
       if (session?.user && !hasLoadedProfile) {
@@ -35,12 +37,12 @@ const [hasLoadedProfile, setHasLoadedProfile] = useState(false);
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-
-        console.log('Got Auth changed event:', event, session);
+        
+        console.log('Got Auth changed event:', event, session, userRef.current);
 
         switch (event) {
             case "INITIAL_SESSION":
-                setUser(session?.user ?? null);
+                userRef.current = session?.user ?? null;
                 setIsAuthenticated(!!session?.user);
                 
                 if (session?.user) {
@@ -56,9 +58,17 @@ const [hasLoadedProfile, setHasLoadedProfile] = useState(false);
               break;
 
             case "SIGNED_IN":
-              if (session?.user?.id !== user?.id) {
+              if (session?.user?.id !== userRef.current?.id) {
+                console.log('A different user signed in:', session?.user.id, userRef.current?.id);
                 if (session?.user) {
-                  await loadUserProfile(session.user.id);
+                  userRef.current = session.user;
+                  setIsAuthenticated(!!session.user);
+                  setLoading(true);
+                  console.log('Loading User Profile after SIGNED_IN:', session);
+                  await loadUserProfile(session.user.id).finally(() => {
+                      setLoading(false);
+                      console.log('Finished loading profile after SIGNED_IN');
+                    });
                 } else {
                   // Clear user data on logout
                   setApiKey('');
@@ -70,7 +80,9 @@ const [hasLoadedProfile, setHasLoadedProfile] = useState(false);
               break;
 
             case "SIGNED_OUT":
-              setUser(null);
+              userRef.current = null;
+              setIsAuthenticated(false);
+
               // Clear user data on logout
               setApiKey('');
               setApiEndpoint('https://api.openai.com/v1/chat/completions');
@@ -179,7 +191,7 @@ const [hasLoadedProfile, setHasLoadedProfile] = useState(false);
   };
 
   return {
-    user,
+    userRef,
     loading,
     isAuthenticated,
     signUp,

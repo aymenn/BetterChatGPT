@@ -97,7 +97,10 @@ export const TotalTokenCostToggle = () => {
   );
 
   useEffect(() => {
-    setCountTotalTokens(isChecked);
+    if (isChecked !== useStore.getState().countTotalTokens) {
+      console.log('countTotalTokens changed:', isChecked);
+      setCountTotalTokens(isChecked);
+    }
   }, [isChecked]);
 
   return (

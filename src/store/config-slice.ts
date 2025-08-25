@@ -18,6 +18,7 @@ export interface ConfigSlice {
   markdownMode: boolean;
   countTotalTokens: boolean;
   totalTokenUsed: TotalTokenUsed;
+  hydrateSettings: (settings: Partial<ConfigSlice>) => void;
   setOpenConfig: (openConfig: boolean) => void;
   setTheme: (theme: Theme) => void;
   setAutoTitle: (autoTitle: boolean) => void;
@@ -47,6 +48,14 @@ export const createConfigSlice: StoreSlice<ConfigSlice> = (set, get) => ({
   markdownMode: true,
   countTotalTokens: false,
   totalTokenUsed: {},
+  hydrateSettings: (settings: Partial<ConfigSlice>) => {
+    console.log('Hydrating settings: ', settings);
+    
+    set((prev: ConfigSlice) => ({
+      ...prev,
+      ...settings,
+    }));
+  },
   setOpenConfig: (openConfig: boolean) => {
     set((prev: ConfigSlice) => ({
       ...prev,

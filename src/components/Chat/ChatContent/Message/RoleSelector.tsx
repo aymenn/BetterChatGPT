@@ -23,7 +23,7 @@ const RoleSelector = React.memo(
     const setInputRole = useStore((state) => state.setInputRole);
     const setChats = useStore((state) => state.setChats);
     const currentChatIndex = useStore((state) => state.currentChatIndex);
-    const { user, isAuthenticated } = useAuth();
+    const { userRef, isAuthenticated } = useAuth();
 
     const [dropDown, setDropDown, dropDownRef] = useHideOnOutsideClick();
 
@@ -63,7 +63,7 @@ const RoleSelector = React.memo(
                     setChats(updatedChats);
                     
                     // Update role in Supabase if authenticated
-                    if (isAuthenticated && user) {
+                    if (isAuthenticated && userRef.current) {
                       SupabaseService.updateMessage(messageId, { role: r }).catch(error => {
                         console.error('Error updating message role in Supabase:', error);
                       });

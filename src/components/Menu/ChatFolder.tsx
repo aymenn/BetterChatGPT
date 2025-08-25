@@ -34,7 +34,7 @@ const ChatFolder = ({
   const folderName = useStore((state) => state.folders[folderId]?.name);
   const isExpanded = useStore((state) => state.folders[folderId]?.expanded);
   const color = useStore((state) => state.folders[folderId]?.color);
-  const { user, isAuthenticated } = useAuth();
+  const { userRef, isAuthenticated } = useAuth();
 
   const setChats = useStore((state) => state.setChats);
   const setFolders = useStore((state) => state.setFolders);
@@ -59,7 +59,7 @@ const ChatFolder = ({
     setIsEdit(false);
     
     // Update in Supabase if authenticated
-    if (isAuthenticated && user) {
+    if (isAuthenticated && userRef.current) {
       SupabaseService.updateFolder(folderId, { name: _folderName }).catch(error => {
         console.error('Error updating folder name in Supabase:', error);
       });
@@ -84,7 +84,7 @@ const ChatFolder = ({
     setIsDelete(false);
     
     // Delete from Supabase and update affected chats if authenticated
-    if (isAuthenticated && user) {
+    if (isAuthenticated && userRef.current) {
       const deleteFromSupabase = async () => {
         try {
           // Update chats to remove folder reference
@@ -113,7 +113,7 @@ const ChatFolder = ({
     setShowPalette(false);
     
     // Update in Supabase if authenticated
-    if (isAuthenticated && user) {
+    if (isAuthenticated && userRef.current) {
       SupabaseService.updateFolder(folderId, { color: _color ?? undefined }).catch(error => {
         console.error('Error updating folder color in Supabase:', error);
       });
@@ -160,7 +160,7 @@ const ChatFolder = ({
       setChats(updatedChats);
       
       // Update in Supabase if authenticated
-      if (isAuthenticated && user) {
+      if (isAuthenticated && userRef.current) {
         SupabaseService.updateChat(updatedChats[chatIndex].id, { folder_id: folderId }).catch(error => {
           console.error('Error updating chat folder in Supabase:', error);
         });

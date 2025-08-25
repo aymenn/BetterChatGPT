@@ -7,7 +7,7 @@ import { useAuth } from '@components/Auth/AuthProvider';
 
 
 export const useSupabaseSync = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { userRef, isAuthenticated } = useAuth();
   const channelRef = useRef<RealtimeChannel | null>(null);
   const settingsChannelRef = useRef<RealtimeChannel | null>(null);
   const [loadingUserData, setLoadingUserData] = useState(false);
@@ -16,32 +16,15 @@ export const useSupabaseSync = () => {
   const setFolders = useStore((state) => state.setFolders);
   const setCurrentChatIndex = useStore((state) => state.setCurrentChatIndex);
   
-  // Settings
-  const setTheme = useStore((state) => state.setTheme);
-  const setAutoTitle = useStore((state) => state.setAutoTitle);
-  const setAdvancedMode = useStore((state) => state.setAdvancedMode);
-  const setHideMenuOptions = useStore((state) => state.setHideMenuOptions);
-  const setHideSideMenu = useStore((state) => state.setHideSideMenu);
-  const setEnterToSubmit = useStore((state) => state.setEnterToSubmit);
-  const setInlineLatex = useStore((state) => state.setInlineLatex);
-  const setMarkdownMode = useStore((state) => state.setMarkdownMode);
-  const setCountTotalTokens = useStore((state) => state.setCountTotalTokens);
-  const setTotalTokenUsed = useStore((state) => state.setTotalTokenUsed);
-  const setPrompts = useStore((state) => state.setPrompts);
-
-  const setDefaultChatConfig = useStore((state) => state.setDefaultChatConfig);
-  const setDefaultSystemMessage = useStore((state) => state.setDefaultSystemMessage);
-
-
   // Load initial data from Supabase
   const loadUserData = async () => {
-    console.log('Loading user data from Supabase...', user);
-    if (!user) return;
+    console.log('Loading user data from Supabase...', userRef.current);
+    if (!userRef.current) return;
 
     setLoadingUserData(true);
     try {
       // Load folders
-      const { data: foldersData } = await SupabaseService.getFolders(user.id);
+      const { data: foldersData } = await SupabaseService.getFolders(userRef.current.id);
       if (foldersData) {
         const folders: FolderCollection = {};
         foldersData.forEach(folder => {
@@ -58,7 +41,7 @@ export const useSupabaseSync = () => {
 
       console.log('Folders loaded');
       // Load chats with messages
-      const { data: chatsData } = await SupabaseService.getChats(user.id);
+      const { data: chatsData } = await SupabaseService.getChats(userRef.current.id);
       if (chatsData) {
         interface ChatGPTMessage {
           role: string;
@@ -101,27 +84,22 @@ export const useSupabaseSync = () => {
       }
       console.log('Chats loaded');
       // Load user settings
-      const { data: settingsData } = await SupabaseService.getUserSettings(user.id);
+      const { data: settingsData } = await SupabaseService.getUserSettings(userRef.current.id);
       if (settingsData) {
-        setTheme(settingsData.theme as any);
-        setAutoTitle(settingsData.auto_title ?? false);
-        setAdvancedMode(settingsData.advanced_mode ?? false);
-        setHideMenuOptions(settingsData.hide_menu_options ?? false);
-        setHideSideMenu(settingsData.hide_side_menu ?? false);
-        setEnterToSubmit(settingsData.enter_to_submit ?? true);
-        setInlineLatex(settingsData.inline_latex ?? false);
-        setMarkdownMode(settingsData.markdown_mode ?? true);
-        setCountTotalTokens(settingsData.count_total_tokens ?? true);
-        setTotalTokenUsed(settingsData.total_token_used as any);
-        setPrompts(settingsData.prompts as any);
-        
-        // Load default chat settings
-        if (settingsData.default_chat_config) {
-          setDefaultChatConfig(settingsData.default_chat_config as any);
-        }
-        if (settingsData.default_system_message) {
-          setDefaultSystemMessage(settingsData.default_system_message);
-        }
+        useStore.getState().hydrateSettings({
+          theme: settingsData.theme as any,
+          autoTitle: settingsData.auto_title ?? false,
+          advancedMode: settingsData.advanced_mode ?? false,
+          hideMenuOptions: settingsData.hide_menu_options ?? false,
+          hideSideMenu: settingsData.hide_side_menu ?? false,
+          enterToSubmit: settingsData.enter_to_submit ?? true,
+          inlineLatex: settingsData.inline_latex ?? false,
+          markdownMode: settingsData.markdown_mode ?? true,
+          countTotalTokens: settingsData.count_total_tokens ?? true,
+          totalTokenUsed: settingsData.total_token_used as any,
+          defaultChatConfig: settingsData.default_chat_config as any,
+          defaultSystemMessage: settingsData.default_system_message ?? '',
+        });
       }
       console.log('Settings loaded');
     } catch (error) {
@@ -134,7 +112,7 @@ export const useSupabaseSync = () => {
 
   // Setup real-time subscriptions
   useEffect(() => {
-    if (!isAuthenticated || !user) {
+    if (!isAuthenticated || !userRef.current) {
       // Cleanup subscriptions when not authenticated
       if (channelRef.current) {
         channelRef.current.unsubscribe();
@@ -154,16 +132,16 @@ export const useSupabaseSync = () => {
     initializeData();
 
     // Setup real-time subscription for chats
-    channelRef.current = SupabaseService.subscribeToUserChats(user.id, (payload) => {
+    channelRef.current = SupabaseService.subscribeToUserChats(userRef.current.id, async (payload) => {
       console.log('Real-time update:', payload);
       // Reload data when changes occur
-      loadUserData();
+      await loadUserData();
     });
 
     // Setup real-time subscription for settings
-    settingsChannelRef.current = SupabaseService.subscribeToUserSettings(user.id, (payload) => {
+    settingsChannelRef.current = SupabaseService.subscribeToUserSettings(userRef.current.id, async (payload) => {
       console.log('Settings update:', payload);
-      loadUserData();
+      await loadUserData();
     });
 
     return () => {
@@ -174,7 +152,7 @@ export const useSupabaseSync = () => {
         settingsChannelRef.current.unsubscribe();
       }
     };
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, userRef.current]);
 
   return {
     loadUserData,
