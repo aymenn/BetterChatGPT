@@ -12,9 +12,13 @@ import {
 
 import { ChatInterface, Folder, FolderCollection } from '@type/chat';
 import { ExportBase } from '@type/export';
+import { SupabaseService } from '@src/services/supabase-service';
+import { useAuth } from '@components/Auth/AuthProvider';
 
 const ImportChat = () => {
   const { t } = useTranslation();
+  const { userRef, isAuthenticated } = useAuth();
+  
   const setChats = useStore.getState().setChats;
   const setFolders = useStore.getState().setFolders;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -23,10 +27,11 @@ const ImportChat = () => {
     success: boolean;
   } | null>(null);
 
-  const handleFileUpload = () => {
+  const handleFileUpload = async () => {
     if (!inputRef || !inputRef.current) return;
     const file = inputRef.current.files?.[0];
 
+    console.log('file', file);
     if (file) {
       const reader = new FileReader();
 
@@ -92,6 +97,26 @@ const ImportChat = () => {
               });
             }
           } else {
+            console.log('Export vX import detected', parsedData);
+
+            Object.values(parsedData.state.folders as FolderCollection).forEach( (folder) => {
+              console.log('Creating foler:', folder)
+              if (isAuthenticated && userRef.current) {
+                SupabaseService.createFolder(userRef.current.id, folder).catch(error => {
+                console.error('Error creating folder in Supabase:', error);
+                });
+              }
+            });
+
+            Object.values(parsedData.state.chats as ChatInterface).forEach( (chat) => {
+              console.log('Creating chat:', chat)
+              if (isAuthenticated && userRef.current) {
+                SupabaseService.createChat(userRef.current.id, chat).catch(error => {
+                console.error('Error creating folder in Supabase:', error);
+                });
+              }
+            });
+
             switch ((parsedData as ExportBase).version) {
               case 1:
                 if (validateExportV1(parsedData)) {
