@@ -16,6 +16,27 @@ export const useSupabaseSync = () => {
   const setFolders = useStore((state) => state.setFolders);
   const setCurrentChatIndex = useStore((state) => state.setCurrentChatIndex);
   
+  const loadSettings = async () => {
+    // Load user settings
+      const { data: settingsData } = await SupabaseService.getUserSettings(userRef.current.id);
+      if (settingsData) {
+        useStore.getState().hydrateSettings({
+          theme: settingsData.theme as any,
+          autoTitle: settingsData.auto_title ?? false,
+          advancedMode: settingsData.advanced_mode ?? false,
+          hideMenuOptions: settingsData.hide_menu_options ?? false,
+          hideSideMenu: settingsData.hide_side_menu ?? false,
+          enterToSubmit: settingsData.enter_to_submit ?? true,
+          inlineLatex: settingsData.inline_latex ?? false,
+          markdownMode: settingsData.markdown_mode ?? true,
+          countTotalTokens: settingsData.count_total_tokens ?? true,
+          totalTokenUsed: settingsData.total_token_used as any,
+          defaultChatConfig: settingsData.default_chat_config as any,
+          defaultSystemMessage: settingsData.default_system_message ?? '',
+        });
+      }
+  }
+
   // Load initial data from Supabase
   const loadUserData = async () => {
     console.log('Loading user data from Supabase...', userRef.current);
@@ -83,24 +104,7 @@ export const useSupabaseSync = () => {
         }
       }
       console.log('Chats loaded');
-      // Load user settings
-      const { data: settingsData } = await SupabaseService.getUserSettings(userRef.current.id);
-      if (settingsData) {
-        useStore.getState().hydrateSettings({
-          theme: settingsData.theme as any,
-          autoTitle: settingsData.auto_title ?? false,
-          advancedMode: settingsData.advanced_mode ?? false,
-          hideMenuOptions: settingsData.hide_menu_options ?? false,
-          hideSideMenu: settingsData.hide_side_menu ?? false,
-          enterToSubmit: settingsData.enter_to_submit ?? true,
-          inlineLatex: settingsData.inline_latex ?? false,
-          markdownMode: settingsData.markdown_mode ?? true,
-          countTotalTokens: settingsData.count_total_tokens ?? true,
-          totalTokenUsed: settingsData.total_token_used as any,
-          defaultChatConfig: settingsData.default_chat_config as any,
-          defaultSystemMessage: settingsData.default_system_message ?? '',
-        });
-      }
+      await loadSettings();
       console.log('Settings loaded');
     } catch (error) {
       console.error('Error loading user data:', error);
@@ -141,7 +145,7 @@ export const useSupabaseSync = () => {
     // Setup real-time subscription for settings
     settingsChannelRef.current = SupabaseService.subscribeToUserSettings(userRef.current.id, async (payload) => {
       console.log('Settings update:', payload);
-      await loadUserData();
+      await loadSettings();
     });
 
     return () => {
@@ -156,6 +160,7 @@ export const useSupabaseSync = () => {
 
   return {
     loadUserData,
+    loadSettings,
     loadingUserData,
   };
 };
